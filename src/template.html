@@ -1,0 +1,397 @@
+<title>Thirty-Seven Waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Petrona:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Palette taken from a NOAA nautical chart: chart white, the shallow-water tint, the buff
+     of drying heights, and the magenta that charts reserve for anything you must not ignore. */
+  --paper:#fbfaf7; --panel:#ffffff; --panel2:#e6eef1; --ink:#16232d; --ink2:#47606d;
+  --ink3:#7d939c; --rule:#c2d2d6; --rule2:#e2eaec;
+  --sea:#b0126a; --sea2:#d4237f; --ebb:#1f5f8f; --flood:#c07a10; --gold:#d8b25c;
+  --good:#2f7d5e; --warn:#a8371f;
+  --shadow:0 1px 2px rgba(22,35,45,.05),0 8px 26px rgba(22,35,45,.07);
+  --grid:rgba(22,35,45,.08);
+  --serif:"Petrona",Georgia,serif;
+  --disp:"Big Shoulders Display","IBM Plex Sans Condensed",Impact,sans-serif;
+  --sans:"IBM Plex Sans Condensed",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+:root:not([data-theme="light"]){ color-scheme:light dark; }
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    /* night bridge: the same chart, lit so it does not blind the watch */
+    --paper:#060d12; --panel:#0c1620; --panel2:#142230; --ink:#dfe9ee; --ink2:#94aab4;
+    --ink3:#647c88; --rule:#22384a; --rule2:#162734;
+    --sea:#ff74b8; --sea2:#ff9ccd; --ebb:#5aa9e6; --flood:#f0a94e; --gold:#e6c268;
+    --good:#5fc59a; --warn:#ff8a6a;
+    --shadow:0 1px 2px rgba(0,0,0,.55),0 10px 32px rgba(0,0,0,.45);
+    --grid:rgba(223,233,238,.10);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+    /* night bridge: the same chart, lit so it does not blind the watch */
+  --paper:#060d12; --panel:#0c1620; --panel2:#142230; --ink:#dfe9ee; --ink2:#94aab4;
+  --ink3:#647c88; --rule:#22384a; --rule2:#162734;
+  --sea:#ff74b8; --sea2:#ff9ccd; --ebb:#5aa9e6; --flood:#f0a94e; --gold:#e6c268;
+  --good:#5fc59a; --warn:#ff8a6a;
+  --shadow:0 1px 2px rgba(0,0,0,.55),0 10px 32px rgba(0,0,0,.45);
+  --grid:rgba(223,233,238,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+     font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:2100px;margin:0 auto;padding:0 clamp(14px,2.2vw,40px)}
+h1,h2,h3{margin:0;font-weight:400}
+a{color:var(--sea);text-underline-offset:2px}
+button{font-family:inherit;font-size:inherit;color:inherit}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- masthead ---------- */
+header.mast{padding:clamp(26px,4vw,60px) 0 22px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink3)}
+h1.title{font-family:var(--disp);font-weight:700;font-size:clamp(52px,9.2vw,138px);
+  line-height:.86;letter-spacing:.004em;margin:26px 0 0;text-transform:uppercase}
+h1.title em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--sea);
+  letter-spacing:-.015em;text-transform:none}
+.standfirst{margin:24px 0 0;max-width:64ch;font-family:var(--serif);font-size:clamp(16px,1.15vw,19px);
+  line-height:1.62;color:var(--ink2)}
+.mastgrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end}
+.mastnums{display:flex;gap:26px;flex-wrap:wrap;justify-content:flex-end}
+.mn{text-align:right}
+.mn b{display:block;font-family:var(--mono);font-size:clamp(19px,1.9vw,27px);font-weight:500;
+  color:var(--sea);letter-spacing:-.02em}
+.mn span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:26px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;
+  background:var(--panel)}
+.seg button{border:0;background:transparent;padding:6px 13px;cursor:pointer;font-size:12.5px;
+  letter-spacing:.03em;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.pill{border:1px solid var(--rule);background:var(--panel);border-radius:999px;padding:6px 14px;
+  cursor:pointer;font-size:12.5px;color:var(--ink2);display:inline-flex;gap:7px;align-items:center}
+.pill[aria-pressed="true"]{border-color:var(--sea);color:var(--sea)}
+
+/* ---------- act scaffolding ---------- */
+section.act{padding:clamp(34px,4.5vw,72px) 0;border-bottom:1px solid var(--rule)}
+.actnum{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--sea);display:flex;align-items:center;gap:12px}
+.actnum::after{content:"";flex:1;height:1px;background:var(--rule)}
+h2.acth{font-family:var(--disp);font-weight:600;font-size:clamp(34px,4.6vw,62px);
+  line-height:.98;margin:16px 0 0;letter-spacing:.006em;max-width:24ch;text-wrap:balance}
+.actintro{margin:16px 0 26px;max-width:74ch;font-family:var(--serif);font-size:16.5px;
+  line-height:1.6;color:var(--ink2)}
+.howto{display:flex;gap:9px;align-items:flex-start;margin:0 0 22px;padding:11px 14px;
+  border:1px dashed var(--rule);border-radius:8px;background:var(--panel);max-width:96ch;
+  font-size:13.5px;color:var(--ink2)}
+.howto b{color:var(--ink);font-weight:600}
+.howto::before{content:"↳";color:var(--sea);font-family:var(--mono)}
+
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;box-shadow:var(--shadow)}
+.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3)}
+
+/* ---------- act I : the map ---------- */
+.mapgrid{display:grid;grid-template-columns:264px minmax(0,1fr) 316px;gap:16px;align-items:start}
+@media (max-width:1240px){.mapgrid{grid-template-columns:1fr}}
+.rail{padding:16px;display:flex;flex-direction:column;gap:18px}
+.rail h3{font-size:13px;letter-spacing:.02em;font-weight:600;margin-bottom:8px}
+.stack{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:baseline;padding:7px 9px;border-radius:7px;cursor:pointer;
+  border:1px solid transparent;background:transparent;text-align:left;width:100%}
+.opt:hover{background:var(--panel2)}
+.opt[aria-pressed="true"]{border-color:var(--sea);background:var(--panel2)}
+.opt b{font-weight:600;font-size:13px;display:block}
+.opt span{font-size:11.5px;color:var(--ink3);line-height:1.35;display:block}
+.mapbox{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;
+  background:var(--panel);box-shadow:var(--shadow)}
+#mapc{display:block;width:100%;height:auto}
+.mapfoot{display:flex;gap:14px;align-items:center;padding:10px 14px;border-top:1px solid var(--rule2);
+  flex-wrap:wrap}
+.clock{font-family:var(--mono);font-size:13px;color:var(--ink);letter-spacing:.02em}
+input[type=range]{-webkit-appearance:none;appearance:none;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--rule);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--sea);margin-top:-6px;border:2px solid var(--panel)}
+input[type=range]::-moz-range-track{height:3px;background:var(--rule);border-radius:2px}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--sea);border:2px solid var(--panel)}
+.legend{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--ink3)}
+.lgswatch{width:120px;height:9px;border-radius:2px;border:1px solid var(--rule)}
+
+/* station card */
+.card{padding:16px;display:flex;flex-direction:column;gap:14px}
+/* Charts set the names of water features in italic serif. So does this. */
+.card .sname{font-family:var(--serif);font-style:italic;font-size:29px;line-height:1.04}
+.card .sloc{font-size:12px;color:var(--ink3);font-family:var(--mono)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:12.5px}
+.kv dt{color:var(--ink2)}
+.kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.tides{display:flex;flex-direction:column;gap:2px}
+.trow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;font-size:12.5px;padding:3px 0;
+  border-bottom:1px dotted var(--rule2)}
+.trow b{font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:.06em}
+.hi{color:var(--flood)} .lo{color:var(--ebb)}
+.searchbox{display:flex;gap:6px}
+.searchbox input{flex:1;min-width:0;padding:7px 10px;border:1px solid var(--rule);border-radius:7px;
+  background:var(--paper);color:var(--ink);font-family:inherit;font-size:13px}
+.results{max-height:190px;overflow:auto;display:flex;flex-direction:column;gap:1px}
+.results button{border:0;background:transparent;text-align:left;padding:5px 8px;border-radius:6px;
+  cursor:pointer;font-size:12.5px;line-height:1.3}
+.results button:hover{background:var(--panel2)}
+.results button span{color:var(--ink3);font-family:var(--mono);font-size:10.5px}
+
+/* ---------- act II : the instrument ---------- */
+.instgrid{display:grid;grid-template-columns:370px minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:1240px){.instgrid{grid-template-columns:1fr}}
+.clist{padding:12px;max-height:640px;overflow:auto}
+.crow{display:grid;grid-template-columns:18px 62px 1fr 66px;gap:8px;align-items:center;
+  padding:5px 7px;border-radius:6px;cursor:pointer;border:1px solid transparent;width:100%;
+  background:transparent;text-align:left}
+.crow:hover{background:var(--panel2)}
+.crow.sel{border-color:var(--sea)}
+.crow.off{opacity:.42}
+.chk{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--rule);position:relative}
+.crow.on .chk{background:var(--sea);border-color:var(--sea)}
+.crow.on .chk::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;
+  border:solid var(--panel);border-width:0 2px 2px 0;transform:rotate(42deg)}
+.cname{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.02em}
+.cbar{height:7px;background:var(--rule2);border-radius:2px;overflow:hidden}
+.cbar i{display:block;height:100%;background:var(--sea)}
+.camp{font-family:var(--mono);font-size:11.5px;color:var(--ink2);text-align:right}
+.curvebox{padding:14px}
+#curvec,#residc,#bayc{display:block;width:100%;height:auto}
+.presets{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.presets button{border:1px solid var(--rule);background:var(--panel);border-radius:999px;
+  padding:5px 12px;font-size:12px;cursor:pointer;color:var(--ink2)}
+.presets button:hover{border-color:var(--sea);color:var(--sea)}
+.readout{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--rule2)}
+.ro b{display:block;font-family:var(--mono);font-size:19px;font-weight:500;letter-spacing:-.01em}
+.ro span{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.detail{padding:16px;display:flex;flex-direction:column;gap:12px}
+.detail .dname{font-family:var(--disp);font-weight:700;font-size:36px;line-height:1;letter-spacing:.01em}
+.detail .ddesc{font-family:var(--serif);font-size:14px;line-height:1.55;color:var(--ink2)}
+#wavec{display:block;width:100%;height:auto;border:1px solid var(--rule2);border-radius:6px}
+
+/* ---------- act III : residual ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{border:1px solid var(--rule);background:var(--panel);border-radius:7px;padding:7px 13px;
+  cursor:pointer;font-size:12.5px;color:var(--ink2);line-height:1.25;text-align:left}
+.tabs button[aria-pressed="true"]{border-color:var(--flood);color:var(--flood);background:var(--panel2)}
+.tabs button i{display:block;font-style:normal;font-size:10.5px;color:var(--ink3);font-family:var(--mono)}
+.evgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media (max-width:1100px){.evgrid{grid-template-columns:1fr}}
+.tiles{display:flex;flex-direction:column;gap:10px}
+.tile{padding:13px 15px}
+.tile b{display:block;font-family:var(--mono);font-size:25px;font-weight:500;letter-spacing:-.02em}
+.tile span{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+.tile p{margin:6px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.45}
+
+/* ---------- act IV : the bay ---------- */
+.baygrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:1100px){.baygrid{grid-template-columns:1fr}}
+
+/* ---------- methods ---------- */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px 30px}
+.mgrid section{max-width:64ch}
+.mgrid h3{font-family:var(--disp);font-weight:600;font-size:26px;line-height:1.05;
+  letter-spacing:.006em;margin-bottom:9px;text-wrap:balance}
+.mgrid p{margin:0 0 10px;font-family:var(--serif);font-size:14.5px;line-height:1.6;color:var(--ink2)}
+.mgrid code{font-family:var(--mono);font-size:12.5px;background:var(--panel2);padding:1px 5px;
+  border-radius:4px;color:var(--ink)}
+.mgrid ul{margin:0 0 10px;padding-left:18px;font-family:var(--serif);font-size:14.5px;
+  line-height:1.55;color:var(--ink2)}
+.plain{display:none;border-left:2px solid var(--sea);padding-left:11px;margin:8px 0 12px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2);line-height:1.5}
+body.pe .plain{display:block}
+footer{padding:34px 0 60px;color:var(--ink3);font-size:12.5px;display:flex;gap:20px;
+  flex-wrap:wrap;justify-content:space-between}
+.crumb{font-family:var(--mono);font-size:11.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<div class="wrap">
+<header class="mast">
+  <div class="mastgrid">
+    <div>
+      <div class="eyebrow">Harmonic tide analysis · NOAA CO-OPS · built <span id="builtdate">—</span></div>
+      <h1 class="title">Thirty-Seven<br><em>Waves</em></h1>
+      <p class="standfirst">Every tide gauge in the United States publishes the same thing: a list of
+      thirty-seven waves. Each one is a pull from the moon or the sun, restated as a sine wave with an
+      amplitude and a phase. Add them up and you get the tide — days, decades, centuries ahead, with no
+      measurement of the ocean at all. This page ships the coefficients for <b id="nst">—</b> stations
+      and does the adding in your browser. Then it goes looking for the days the sum was wrong.</p>
+    </div>
+    <div class="mastnums">
+      <div class="mn"><b id="hnst">—</b><span>tide stations</span></div>
+      <div class="mn"><b id="hnc">—</b><span>constituents each</span></div>
+      <div class="mn"><b>±0.02 ft</b><span>vs NOAA's own predictions</span></div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <span class="lbl">Theme</span>
+    <div class="seg" id="themeseg">
+      <button data-t="auto" aria-pressed="true">Auto</button>
+      <button data-t="light" aria-pressed="false">Light</button>
+      <button data-t="dark" aria-pressed="false">Dark</button>
+    </div>
+    <button class="pill" id="pebtn" aria-pressed="false">Plain English</button>
+    <span class="lbl" style="margin-left:auto">Reading a tide is a skill; this page assumes none of it.</span>
+  </div>
+</header>
+
+<!-- ================= ACT I ================= -->
+<section class="act">
+  <div class="actnum">One · the map that draws itself</div>
+  <h2 class="acth">There is no coastline in this file.</h2>
+  <p class="actintro">Every dot below is a tide gauge, placed at its own latitude and longitude. Nothing
+  else is drawn — no basemap, no outlines. The shape of the country appears because the gauges are on the
+  water, and there are enough of them. Press play and each dot is coloured by the water level the model
+  computes for it at that instant, so you are watching the tide sweep the coasts, not an animation of one.</p>
+  <div class="howto"><span><b>How to read it:</b> warm = water above its local mean, blue = below,
+  pale = mid-tide. Dot size is that station's tidal range. The Gulf of Mexico moves once a day while the
+  Atlantic moves twice — watch the Gulf hold still while Maine swings.</span></div>
+
+  <div class="mapgrid">
+    <div class="panel rail">
+      <div>
+        <h3>Colour the dots by</h3>
+        <div class="stack" id="layers">
+          <button class="opt" data-layer="level" aria-pressed="true"><b>Water level now</b><span>the model, running</span></button>
+          <button class="opt" data-layer="phase" aria-pressed="false"><b>Time of high water</b><span>the cotidal chart — when M2 crests</span></button>
+          <button class="opt" data-layer="range" aria-pressed="false"><b>Tidal range</b><span>how far it moves</span></button>
+          <button class="opt" data-layer="form" aria-pressed="false"><b>Once or twice a day</b><span>the form factor</span></button>
+        </div>
+      </div>
+      <div>
+        <h3>Clock</h3>
+        <div class="stack">
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="pill" id="playbtn" aria-pressed="true">⏸ Pause</button>
+            <select id="speed" style="flex:1;min-width:0;padding:5px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:12px">
+              <option value="600">10 min / sec</option>
+              <option value="1800" selected>30 min / sec</option>
+              <option value="7200">2 h / sec</option>
+              <option value="21600">6 h / sec</option>
+            </select>
+          </div>
+          <div class="clock" id="clockread">—</div>
+          <input type="range" id="timeslider" min="0" max="1440" value="0" style="width:100%">
+          <button class="pill" id="nowbtn" style="justify-content:center">Back to now</button>
+        </div>
+      </div>
+      <div>
+        <h3>Find a station</h3>
+        <div class="searchbox"><input id="q" placeholder="Annapolis, Astoria, Kahului…" autocomplete="off"></div>
+        <div class="results" id="qres"></div>
+      </div>
+    </div>
+
+    <div class="mapbox">
+      <canvas id="mapc" width="1600" height="1000"></canvas>
+      <div class="mapfoot">
+        <span class="lbl">Legend</span>
+        <div class="legend"><span id="lgmin">low</span><span class="lgswatch" id="lgsw"></span><span id="lgmax">high</span></div>
+        <span class="lbl" style="margin-left:auto" id="mapnote">1,303 gauges · click one</span>
+      </div>
+    </div>
+
+    <div class="panel card" id="stcard"></div>
+  </div>
+</section>
+
+<!-- ================= ACT II ================= -->
+<section class="act">
+  <div class="actnum">Two · the instrument</div>
+  <h2 class="acth">Take the tide apart, then put it back together.</h2>
+  <p class="actintro">These are the thirty-seven waves for the station you selected, each with the
+  amplitude and phase NOAA measured from years of that gauge's own record. Switch them on one at a time and
+  watch the curve become a tide. The error readout compares your partial sum against all thirty-seven —
+  it is the honest answer to "how much of the tide is just the moon?"</p>
+  <div class="howto"><span><b>Try this:</b> start with <b>M2 only</b> — a perfectly regular wave, twice a
+  day, the same height every time. Add <b>S2</b> and the heights start to breathe over a fortnight: that
+  beat between the moon's tide and the sun's is spring and neap tides, and it is the whole of it.</span></div>
+
+  <div class="instgrid">
+    <div class="panel clist" id="clist"></div>
+    <div class="panel curvebox">
+      <div class="presets" id="presets">
+        <button data-p="m2">M2 only</button>
+        <button data-p="ms">Moon + sun</button>
+        <button data-p="big4">The big four</button>
+        <button data-p="astro">Astronomical only</button>
+        <button data-p="shallow">Shallow-water only</button>
+        <button data-p="all">All thirty-seven</button>
+        <button data-p="none">Clear</button>
+      </div>
+      <canvas id="curvec" width="1500" height="560"></canvas>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+        <span class="lbl">Window</span>
+        <div class="seg" id="spanseg">
+          <button data-d="2" aria-pressed="false">2 days</button>
+          <button data-d="7" aria-pressed="true">7 days</button>
+          <button data-d="30" aria-pressed="false">30 days</button>
+          <button data-d="365" aria-pressed="false">a year</button>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro"><b id="roN">—</b><span>waves in use</span></div>
+        <div class="ro"><b id="roRms">—</b><span>rms error vs all 37</span></div>
+        <div class="ro"><b id="roVar">—</b><span>of the tide explained</span></div>
+        <div class="ro"><b id="roRange">—</b><span>range in this window</span></div>
+      </div>
+    </div>
+    <div class="panel detail" id="cdetail"></div>
+  </div>
+</section>
+
+<!-- ================= ACT III ================= -->
+<section class="act">
+  <div class="actnum">Three · the residual</div>
+  <h2 class="acth">Subtract the moon. What is left is weather.</h2>
+  <p class="actintro">The model above knows nothing about wind, pressure, rainfall or hurricanes — only
+  astronomy. So the difference between what it predicts and what the gauge actually recorded is, almost
+  exactly, the weather's contribution to sea level. That difference has a name: storm surge. Below, the
+  page runs its own thirty-seven-wave prediction across days when things went wrong, and shades the gap.</p>
+  <div class="howto"><span><b>How to read it:</b> the thin line is what the gauge recorded, the dashed
+  line is what the moon and sun alone called for, and the shaded band between them is the storm.
+  Everything is in feet above local mean sea level.</span></div>
+  <div class="tabs" id="evtabs"></div>
+  <div class="evgrid">
+    <div class="panel curvebox"><canvas id="residc" width="1600" height="600"></canvas></div>
+    <div class="tiles" id="evtiles"></div>
+  </div>
+</section>
+
+<!-- ================= ACT IV ================= -->
+<section class="act">
+  <div class="actnum">Four · close to home</div>
+  <h2 class="acth">The high tide in Washington left the Atlantic yesterday.</h2>
+  <p class="actintro">The Potomac at the foot of Wisconsin Avenue is tidal, and the crest that arrives
+  there is not a local event: it is a wave that entered the Chesapeake at Cape Henry and has been
+  travelling ever since. Because every gauge publishes its M2 phase in the same Greenwich reference, the
+  travel time can simply be read off — no model, no assumption, just subtraction.</p>
+  <div class="howto"><span><b>How to read it:</b> each bar is one gauge, ordered up the bay and then up
+  the river. The bar length is how long after the Bay mouth that station sees its high water; the dot is
+  the size of the tide there.</span></div>
+  <div class="baygrid">
+    <div class="panel curvebox"><canvas id="bayc" width="1500" height="600"></canvas></div>
+    <div class="tiles" id="baytiles"></div>
+  </div>
+</section>
+
+<!-- ================= METHODS ================= -->
+<section class="act" id="methods">
+  <div class="actnum">How this was made, and where it is wrong</div>
+  <h2 class="acth">Methods, limits, and the bug that cost the most.</h2>
+  <div class="mgrid" id="mgrid"></div>
+</section>
+
+<footer>
+  <span class="crumb">Thirty-Seven Waves · a Quick Project · data: NOAA CO-OPS, public domain</span>
+  <span class="crumb" id="footnums">—</span>
+</footer>
+</div>
+<script id="payload" type="application/octet-stream">__PAYLOAD__</script>
